@@ -132,6 +132,13 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
 
 /* ---------- GARDEN ---------- */
 .meadowbox{border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#07070f 0%,#0a1014 38%,#0a1511 68%,#0b1c14 100%);border:1px solid var(--line);cursor:pointer}
+.bloomrow{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px}
+.bloom{background:linear-gradient(180deg,#0a0a12,#0b1a13);border:1px solid var(--line);border-radius:12px;aspect-ratio:3/4;position:relative;overflow:hidden;cursor:pointer;transition:transform .12s,border-color .15s}
+.bloom:active{transform:scale(.96)}
+.bloom:hover{border-color:rgba(74,222,128,.35)}
+.bloom canvas{width:100%;height:100%;display:block}
+.bloom span{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;color:var(--dim2);font-weight:700;letter-spacing:.04em}
+.bloom i{position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--acc);opacity:.85}
 #todayMeadow,#fullMeadow{display:block;width:100%}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:9px}
 .stat{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 9px;text-align:center}
@@ -255,7 +262,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
     <div class="card">
       <h3>Tämän päivän niitty</h3>
-      <div class="meadowbox"><canvas id="todayMeadow" onclick="meadowClick(this,event)"></canvas></div>
+      <div class="bloomrow" id="todayBlooms"></div>
       <p class="tiny mt12" id="todayTip"></p>
     </div>
   </section>
@@ -647,8 +654,7 @@ function drawMeadow(cv, list, live){
   if(!cv) return;
   const dpr=Math.min(window.devicePixelRatio||1,2);
   const W=cv.clientWidth||300;
-  const H=live? Math.max(112,Math.min(168,Math.round(W*.34)))
-              : Math.max(168,Math.min(288,Math.round(W*.56)));
+  const H=Math.max(168,Math.min(288,Math.round(W*.56)));
   cv.style.height=H+'px';
   if(cv.width!==Math.round(W*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
   const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
@@ -727,8 +733,7 @@ function meadowClick(cv,ev){
 function meadowLoop(){
   meadowRaf=requestAnimationFrame(meadowLoop);
   if(document.hidden) return;
-  const a=$('#todayMeadow'), b=$('#fullMeadow');
-  if(a&&a.offsetParent) drawMeadow(a, S.sessions.filter(x=>dayOf(x.t)===today()), true);
+  const b=$('#fullMeadow');
   if(b&&b.offsetParent) drawMeadow(b, S.sessions, false);
 }
 
@@ -978,14 +983,21 @@ function renderNyt(){
     : '<span class="tiny">Listalla ei ole tehtäviä. Voit myös kirjoittaa aiheen suoraan yllä olevaan kenttään.</span>';
 
   renderDump();
-  const tg=S.sessions.filter(x=>dayOf(x.t)===today());
-  drawMeadow($('#todayMeadow'), tg, true);
-  if(!meadowRaf) meadowLoop();
+  const tg=S.sessions.filter(x=>dayOf(x.t)===today()).slice(-14);
+  $('#todayBlooms').innerHTML = tg.length
+    ? tg.map(bloomCell).join('')
+    : '<p class="tiny" style="grid-column:1/-1">Maa on vielä paljas. Ensimmäinen jakso kylvää tämän päivän ensimmäisen kukan.</p>';
+  tg.forEach(paintBloom);
   $('#todayTip').textContent = tg.length
-    ? 'Napauta kukkaa, niin näet, mistä jaksosta se kasvoi.'
-    : 'Niitty on vielä paljas. Ensimmäinen jakso kylvää ensimmäisen kukan.';
+    ? 'Napauta kukkaa, niin näet mistä jaksosta se kasvoi. Illalla ne siirtyvät niitylle muiden joukkoon.'
+    : '';
 }
 function pick(id){ const t=S.tasks.find(x=>x.id===id); if(!t)return; $('#curTask').value=t.name; if(t.min){ S.dur=t.min; save(); } renderNyt(); toast('Valittu: '+t.name.slice(0,28)); }
+function bloomCell(s){
+  return '<div class="bloom" onclick="sesInfo(\''+s.id+'\')" title="'+esc(s.task)+'">'+
+         '<canvas id="b_'+s.id+'"></canvas>'+(s.done?'<i></i>':'')+'<span>'+s.min+' min</span></div>';
+}
+function paintBloom(s){ const cv=$('#b_'+s.id); if(cv) drawPlant(cv,s.seed,s.p,false,s.done,s.planned||s.min); }
 function sesInfo(id){
   const s=S.sessions.find(x=>x.id===id); if(!s) return;
   const d=new Date(s.t);
