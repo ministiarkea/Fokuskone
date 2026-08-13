@@ -8,7 +8,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Fokuskone">
-<meta name="description" content="Fokuskone - keskittymisen tyokalu ADHD-aivoille. Ajastin, kasvava puutarha ja tekoalyapuri.">
+<meta name="description" content="Fokuskone — keskittymisen työkalu ADHD-aivoille. Ajastin, kasvava niitty ja tekoälyapuri.">
 <title>FOKUSKONE</title>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -131,10 +131,8 @@ hr{border:none;border-top:1px solid var(--line);margin:14px 0}
 .fmeta{display:flex;gap:14px;font-size:11px;color:var(--dim2);margin-top:10px}
 
 /* ---------- GARDEN ---------- */
-.garden{display:grid;grid-template-columns:repeat(auto-fill,minmax(74px,1fr));gap:8px}
-.gcell{background:var(--bg2);border:1px solid var(--line);border-radius:12px;aspect-ratio:3/4;position:relative;overflow:hidden;cursor:pointer}
-.gcell canvas{width:100%;height:100%;display:block}
-.gcell span{position:absolute;bottom:3px;left:0;right:0;text-align:center;font-size:9px;color:var(--dim2);font-weight:600}
+.meadowbox{border-radius:12px;overflow:hidden;background:linear-gradient(180deg,#07070f 0%,#0a1014 38%,#0a1511 68%,#0b1c14 100%);border:1px solid var(--line);cursor:pointer}
+#todayMeadow,#fullMeadow{display:block;width:100%}
 .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(78px,1fr));gap:9px}
 .stat{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 9px;text-align:center}
 .stat b{display:block;font-size:20px;font-weight:750;letter-spacing:-.02em}
@@ -222,7 +220,7 @@ details[open] summary::before{transform:rotate(90deg)}
       <h3>Miten vire on juuri nyt?</h3>
       <div class="vire mb16" id="vireBox">
         <button data-v="1"><span class="e">🪫</span>Tyhjä</button>
-        <button data-v="2"><span class="e">🔋</span>Keskiverto</button>
+        <button data-v="2"><span class="e">🔋</span>Tavallinen</button>
         <button data-v="3"><span class="e">⚡</span>Terävä</button>
       </div>
       <p class="tiny mb16" id="vireTip" style="display:none"></p>
@@ -241,13 +239,13 @@ details[open] summary::before{transform:rotate(90deg)}
         <button class="chip" data-d="0">∞ auki</button>
       </div>
 
-      <button class="startbtn" onclick="startSession()">ALOITA<small id="startSub">25 minuuttia · kasvi kasvaa</small></button>
+      <button class="startbtn" onclick="startSession()">ALOITA<small id="startSub">25 minuuttia · niitylle kasvaa kukka</small></button>
       <button class="btn ghost wide mt12" style="color:var(--vio)" onclick="openApuri('stuck')">En pääse alkuun → Apuri</button>
     </div>
 
     <div class="card">
       <h3>Aivotyhjennys</h3>
-      <p class="tiny mb12">Ajatus vie tilaa, kunnes se on ulkona päästä. Heitä se tänne, älä ala tehdä sitä.</p>
+      <p class="tiny mb12">Ajatus vie tilaa niin kauan kuin se pyörii päässä. Kirjoita se tähän äläkä ala tehdä sitä.</p>
       <div class="row">
         <input id="dumpIn" class="grow" placeholder="Mitä pyörii mielessä?" autocomplete="off" onkeydown="if(event.key==='Enter')addDump()">
         <button class="btn sm" onclick="addDump()">Heitä</button>
@@ -256,8 +254,8 @@ details[open] summary::before{transform:rotate(90deg)}
     </div>
 
     <div class="card">
-      <h3>Tänään kasvanut</h3>
-      <div class="garden" id="todayGarden"></div>
+      <h3>Tämän päivän niitty</h3>
+      <div class="meadowbox"><canvas id="todayMeadow" onclick="meadowClick(this,event)"></canvas></div>
       <p class="tiny mt12" id="todayTip"></p>
     </div>
   </section>
@@ -271,8 +269,8 @@ details[open] summary::before{transform:rotate(90deg)}
       <div class="row mb8">
         <select id="ntVire" class="grow">
           <option value="0">Mikä tahansa vire</option>
-          <option value="1">🪫 Sopii tyhjälle päivälle</option>
-          <option value="2">🔋 Vaatii keskivertovireen</option>
+          <option value="1">🪫 Onnistuu tyhjälläkin päivällä</option>
+          <option value="2">🔋 Vaatii tavallisen vireen</option>
           <option value="3">⚡ Vaatii terävän vireen</option>
         </select>
         <select id="ntMin" style="width:110px;flex:none">
@@ -297,7 +295,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
     <div class="card">
       <h3>Aivotyhjennyksen kori</h3>
-      <p class="tiny mb12">Raakoja ajatuksia. Muuta tehtäväksi tai heitä pois.</p>
+      <p class="tiny mb12">Käsittelemättömiä ajatuksia. Tee niistä tehtäviä tai päästä irti.</p>
       <div id="dumpList2"></div>
     </div>
 
@@ -308,14 +306,14 @@ details[open] summary::before{transform:rotate(90deg)}
     </details>
   </section>
 
-  <!-- ============ PUUTARHA ============ -->
+  <!-- ============ NIITTY ============ -->
   <section class="view" id="v-puu">
-    <h1 class="mb8">Puutarha</h1>
-    <p class="sub mb16">Jokainen kasvi on yksi keskittymisjakso, jonka veit loppuun.</p>
+    <h1 class="mb8">Niitty</h1>
+    <p class="sub mb16">Jokainen kukka on yksi keskittymisjakso. Myös kesken jäänyt: niitylle ei jää aukkoja siitä, ettei jaksanut loppuun asti.</p>
 
     <div class="card">
       <div class="statgrid">
-        <div class="stat"><b id="sTot">0</b><span>kasvia</span></div>
+        <div class="stat"><b id="sTot">0</b><span>kukkaa</span></div>
         <div class="stat"><b id="sHrs">0</b><span>tuntia</span></div>
         <div class="stat"><b id="sStreak">0</b><span>pv putki</span></div>
         <div class="stat"><b id="sBest">0</b><span>paras pv</span></div>
@@ -338,13 +336,13 @@ details[open] summary::before{transform:rotate(90deg)}
     </div>
 
     <div class="card">
-      <h3>Kokoelma</h3>
-      <div class="garden" id="fullGarden"></div>
+      <h3>Koko niitty</h3>
+      <div class="meadowbox"><canvas id="fullMeadow" onclick="meadowClick(this,event)"></canvas></div>
       <p class="tiny mt12" id="gardenEmpty"></p>
     </div>
 
     <div class="card">
-      <h3>Mitä data kertoo</h3>
+      <h3>Mitä luvut kertovat</h3>
       <div id="insights"></div>
     </div>
   </section>
@@ -352,7 +350,7 @@ details[open] summary::before{transform:rotate(90deg)}
   <!-- ============ APURI ============ -->
   <section class="view" id="v-apu">
     <h1 class="mb8">Apuri</h1>
-    <p class="sub mb16">Kerro tilanne omin sanoin. Apuri pilkkoo sen niin pieneksi, että aloittaminen on helpompaa kuin välttely.</p>
+    <p class="sub mb16">Kerro tilanne omin sanoin. Apuri pilkkoo sen niin pieniin osiin, että aloittaminen käy helpommaksi kuin välttely.</p>
 
     <div class="card">
       <h3>Missä olet jumissa?</h3>
@@ -382,7 +380,7 @@ details[open] summary::before{transform:rotate(90deg)}
           <a class="btn sm" href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT ↗</a>
         </div>
       </details>
-      <p class="tiny mt12">Ilman API-avainta apuri rakentaa kehotteen, jonka kopioit haluamaasi tekoälyyn. Asetuksista voit lisätä oman Gemini-avaimen, jolloin vastaus tulee suoraan tähän.</p>
+      <p class="tiny mt12">Ilman API-avainta apuri rakentaa valmiin kehotteen, jonka viet haluamaasi tekoälyyn. Asetuksista voit lisätä oman Gemini-avaimesi, jolloin vastaus ilmestyy suoraan tähän.</p>
     </div>
   </section>
 
@@ -405,13 +403,13 @@ details[open] summary::before{transform:rotate(90deg)}
 
     <div class="card">
       <h3>Aloitusrituaali</h3>
-      <p class="tiny mb12">Kolmen sekunnin lähtölaskenta ennen jakson alkua madaltaa aloituskitkaa.</p>
+      <p class="tiny mb12">Kolmen sekunnin lähtölaskenta ennen jaksoa madaltaa aloituskynnystä.</p>
       <label class="row" style="justify-content:space-between"><span>Lähtölaskenta päällä</span><input type="checkbox" id="setRitual" style="width:auto" onchange="S.ritual=this.checked;save()"></label>
     </div>
 
     <div class="card">
       <h3>Tekoäly suoraan sovellukseen</h3>
-      <p class="tiny mb12">Valinnainen. Liitä oma Google AI Studio -avain, niin apuri vastaa suoraan täällä. Avain tallennetaan vain tähän selaimeen eikä lähde minnekään muualle kuin Googlen rajapintaan.</p>
+      <p class="tiny mb12">Valinnainen. Liitä oma Google AI Studio -avaimesi, niin apuri vastaa suoraan täällä. Avain tallentuu vain tähän selaimeen eikä lähde minnekään muualle kuin Googlen rajapintaan.</p>
       <input id="setKey" type="password" placeholder="Gemini API-avain (valinnainen)" class="mb8" onchange="S.key=this.value.trim();save();toast(S.key?'Avain tallennettu':'Avain poistettu')">
       <input id="setModel" placeholder="gemini-2.5-flash" class="mb8" onchange="S.model=this.value.trim();save()">
       <p class="tiny"><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" style="color:var(--acc2)">Hae ilmainen avain aistudio.google.com ↗</a></p>
@@ -419,7 +417,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
     <div class="card">
       <h3>Data</h3>
-      <p class="tiny mb12">Kaikki tallentuu vain tälle laitteelle. Ei tiliä, ei pilveä, ei seurantaa. Ota varmuuskopio jos vaihdat laitetta.</p>
+      <p class="tiny mb12">Kaikki tallentuu vain tälle laitteelle. Ei tiliä, ei pilveä, ei seurantaa. Ota varmuuskopio, jos vaihdat laitetta tai tyhjennät selaimen.</p>
       <div class="wrap">
         <button class="btn sm" onclick="exportData()">↓ Varmuuskopio</button>
         <button class="btn sm" onclick="document.getElementById('impFile').click()">↑ Tuo data</button>
@@ -430,7 +428,7 @@ details[open] summary::before{transform:rotate(90deg)}
 
     <div class="card">
       <h3>Fokuskone</h3>
-      <p class="tiny">Keskittymisen työkalu ADHD-aivoille. Toimii offline. Lisää kotivalikkoon: selaimen jakovalikko → Lisää aloitusnäyttöön.</p>
+      <p class="tiny">Keskittymisen työkalu ADHD-aivoille. Toimii myös ilman verkkoyhteyttä. Saat sen kotivalikkoon selaimen jakovalikosta kohdasta <b>Lisää aloitusnäyttöön</b>.</p>
     </div>
   </section>
 
@@ -441,7 +439,7 @@ details[open] summary::before{transform:rotate(90deg)}
   <nav>
     <button class="on" data-v="nyt" onclick="go('nyt')"><span class="ic">◉</span>NYT</button>
     <button data-v="teht" onclick="go('teht')"><span class="ic">☰</span>TEHTÄVÄT</button>
-    <button data-v="puu" onclick="go('puu')"><span class="ic">🌱</span>PUUTARHA</button>
+    <button data-v="puu" onclick="go('puu')"><span class="ic">🌱</span>NIITTY</button>
     <button data-v="apu" onclick="go('apu')"><span class="ic">✦</span>APURI</button>
   </nav>
 </div>
@@ -560,7 +558,182 @@ function rng(seed){ let a=seed>>>0; return function(){ a|=0;a=a+0x6D2B79F5|0; le
 const ease=t=>1-Math.pow(1-t,2.1);
 const cl=(v,a,b)=>Math.max(a,Math.min(b,v));
 
-function drawPlant(cv, seed, p, live, bloom){
+/* ---------- NIITTYLAJIT ---------- */
+const TIERSP=[['ketoneilikka','kissankello'],['paivankakkara','ruiskaunokki'],['ahdekaunokki','nurmikaunokki'],['maarianohdake']];
+const TIERR=[2.0,2.8,3.2,4.3];
+function tierOf(m){ return m<10?0 : m<21?1 : m<50?2 : 3; }
+function sesTier(s){ return tierOf(s.planned||s.min||5); }
+function sesSpecies(s){ const t=TIERSP[sesTier(s)]; return t[(s.seed>>>3)%t.length]; }
+
+function petals(c,x,y,n,len,wid,rot,fill){
+  for(let i=0;i<n;i++){ const a=rot+i/n*Math.PI*2;
+    c.save(); c.translate(x,y); c.rotate(a); c.fillStyle=fill;
+    c.beginPath(); c.ellipse(0,-len*.5,wid,len*.5,0,0,7); c.fill(); c.restore(); }
+}
+function hairs(c,x,y,n,len,rot,col,lw,spread,up){
+  c.strokeStyle=col; c.lineWidth=lw; c.lineCap='round';
+  for(let i=0;i<n;i++){
+    const a=rot+((i+.5)/n-.5)*spread-(up?Math.PI/2:0);
+    const L=len*(.70+((i*7919)%17)/17*.46);
+    c.beginPath(); c.moveTo(x,y);
+    c.quadraticCurveTo(x+Math.cos(a)*L*.5,y+Math.sin(a)*L*.5,x+Math.cos(a)*L,y+Math.sin(a)*L);
+    c.stroke(); }
+}
+function drawHead(c,sp,x,y,R,al,tint,gr){
+  const A=al*gr;
+  if(sp==='paivankakkara'){
+    petals(c,x,y,14,R*2.0,R*.30,.4,'hsla(48,16%,93%,'+(A*.92)+')');
+    c.fillStyle='hsla(48,88%,58%,'+A+')'; c.beginPath(); c.arc(x,y,R*.52,0,7); c.fill();
+    c.fillStyle='hsla(40,70%,44%,'+(A*.5)+')'; c.beginPath(); c.arc(x-R*.12,y+R*.12,R*.22,0,7); c.fill();
+  } else if(sp==='ruiskaunokki'){
+    const H2=218+tint;
+    c.fillStyle='hsla('+H2+',62%,60%,'+(A*.95)+')';
+    for(let i=0;i<7;i++){ const a=i/7*Math.PI*2+.3;
+      c.save(); c.translate(x,y); c.rotate(a);
+      c.beginPath(); c.moveTo(0,0);
+      c.lineTo(-R*.42,-R*1.5); c.lineTo(-R*.14,-R*2.0);
+      c.lineTo(0,-R*1.55); c.lineTo(R*.14,-R*2.0); c.lineTo(R*.42,-R*1.5);
+      c.closePath(); c.fill(); c.restore(); }
+    c.fillStyle='hsla('+(H2+16)+',52%,38%,'+A+')'; c.beginPath(); c.arc(x,y,R*.58,0,7); c.fill();
+  } else if(sp==='ketoneilikka'){
+    const kc='hsla('+(340+tint)+',58%,74%,'+(A*.95)+')';
+    for(let kp=0;kp<5;kp++){ const ka=.9+kp/5*Math.PI*2;
+      c.save(); c.translate(x,y); c.rotate(ka); c.fillStyle=kc;
+      c.beginPath(); c.ellipse(-R*.30,-R*.80,R*.34,R*.62,-.22,0,7); c.fill();
+      c.beginPath(); c.ellipse( R*.30,-R*.80,R*.34,R*.62, .22,0,7); c.fill();
+      c.beginPath(); c.ellipse(0,-R*.44,R*.44,R*.34,0,0,7); c.fill();
+      c.restore(); }
+    c.fillStyle='hsla('+(346+tint)+',44%,46%,'+(A*.85)+')'; c.beginPath(); c.arc(x,y,R*.34,0,7); c.fill();
+  } else if(sp==='kissankello'){
+    const nb=Math.max(1,Math.min(3,1+Math.floor((tint+7)/5))), S=R*1.15, hue2=256+tint;
+    for(let b2=0;b2<nb;b2++){
+      const bx2=x+(b2-(nb-1)/2)*R*1.7, by2=y+b2*R*.42;
+      c.strokeStyle='hsla(140,26%,38%,'+(A*.7)+')'; c.lineWidth=Math.max(.4,R*.10);
+      c.beginPath(); c.moveTo(x,y-R*.2); c.quadraticCurveTo((x+bx2)/2,by2-S*.5,bx2,by2-S*.15); c.stroke();
+      c.fillStyle='hsla('+hue2+',44%,'+(67-b2*4)+'%,'+(A*.93)+')';
+      c.beginPath(); c.moveTo(bx2-S*.30,by2);
+      c.quadraticCurveTo(bx2-S*.60,by2+S*.85,bx2-S*.52,by2+S*1.25);
+      for(let k2=0;k2<=4;k2++){ const rx=bx2-S*.52+S*1.04*(k2/4);
+        c.quadraticCurveTo(rx+S*.13,by2+S*1.52,rx+S*.26,by2+S*1.25); }
+      c.quadraticCurveTo(bx2+S*.60,by2+S*.85,bx2+S*.30,by2);
+      c.quadraticCurveTo(bx2,by2-S*.26,bx2-S*.30,by2); c.closePath(); c.fill();
+      c.fillStyle='hsla('+(hue2+6)+',40%,84%,'+(A*.28)+')';
+      c.beginPath(); c.ellipse(bx2-S*.16,by2+S*.6,S*.10,S*.42,0,0,7); c.fill();
+    }
+  } else if(sp==='ahdekaunokki'||sp==='nurmikaunokki'){
+    const nu=sp==='nurmikaunokki';
+    c.fillStyle=nu?'hsla(28,26%,26%,'+A+')':'hsla(96,16%,30%,'+A+')';
+    c.beginPath(); c.ellipse(x,y,R*.72,R*.56,0,0,7); c.fill();
+    hairs(c,x,y-R*.34,15,R*(nu?1.55:1.85),0,'hsla('+(320+tint)+',44%,'+(nu?58:64)+'%,'+(A*.92)+')',Math.max(.45,R*.15),4.4,true);
+    c.fillStyle='hsla('+(320+tint)+',40%,70%,'+(A*.5)+')'; c.beginPath(); c.arc(x,y-R*.35,R*.3,0,7); c.fill();
+  } else {
+    c.strokeStyle='hsla(88,26%,44%,'+A+')'; c.lineWidth=Math.max(.5,R*.15); c.lineCap='round';
+    for(let i3=0;i3<9;i3++){ const a3=.08*Math.PI+i3/8*.84*Math.PI;
+      c.beginPath(); c.moveTo(x,y+R*.1);
+      c.lineTo(x+Math.cos(a3)*R*1.35, y+R*.1+Math.sin(a3)*R*1.15); c.stroke(); }
+    c.fillStyle='hsla(94,20%,32%,'+A+')';
+    c.beginPath(); c.ellipse(x,y,R*.80,R*.66,0,0,7); c.fill();
+    c.strokeStyle='hsla(96,16%,48%,'+(A*.5)+')'; c.lineWidth=.5;
+    c.beginPath(); c.ellipse(x,y,R*.80,R*.66,0,0,7); c.stroke();
+    hairs(c,x,y-R*.5,17,R*2.15,0,'hsla('+(288+tint)+',48%,66%,'+(A*.9)+')',Math.max(.42,R*.12),3.5,true);
+  }
+}
+
+/* ---------- NIITTY ---------- */
+function mhash(i,salt){ let x=(i*2654435761+salt*40503)>>>0; x^=x>>>15; x=Math.imul(x,2246822507); x^=x>>>13; return ((x>>>0)/4294967296); }
+let meadowRaf=null, meadowHit=[];
+
+function drawMeadow(cv, list, live){
+  if(!cv) return;
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const W=cv.clientWidth||300;
+  const H=live? Math.max(112,Math.min(168,Math.round(W*.34)))
+              : Math.max(168,Math.min(288,Math.round(W*.56)));
+  cv.style.height=H+'px';
+  if(cv.width!==Math.round(W*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
+  const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,W,H);
+  const now=performance.now(), ph=now/1750;
+
+  const hz=c.createRadialGradient(W*.5,H*.28,1,W*.5,H*.28,W*.72);
+  hz.addColorStop(0,'rgba(70,110,120,.16)'); hz.addColorStop(1,'rgba(70,110,120,0)');
+  c.fillStyle=hz; c.fillRect(0,0,W,H);
+
+  const gn=Math.round(W/4.6);
+  for(let i=0;i<gn;i++){
+    const gx=mhash(i,21)*W, gy=H*(.30+mhash(i,22)*.66), gh=H*(.042+mhash(i,23)*.075);
+    const gl=(mhash(i,24)-.5)*gh*.9 + Math.sin(ph+i)*gh*.12;
+    c.strokeStyle='hsla(140,28%,'+(24+mhash(i,26)*16)+'%,'+(.14+mhash(i,25)*.18)+')';
+    c.lineWidth=.7; c.lineCap='round';
+    c.beginPath(); c.moveTo(gx,gy); c.quadraticCurveTo(gx+gl*.4,gy-gh*.6,gx+gl,gy-gh); c.stroke();
+  }
+
+  const src=list.slice(-420);
+  const fl=src.map(s=>{
+    const k=s.seed>>>0;
+    return { s, d:mhash(k,2), x:.03+mhash(k,1)*.94, lean:(mhash(k,3)-.5)*.62,
+             hh:.60+mhash(k,4)*.55, ph:mhash(k,11)*6.28, tint:(mhash(k,12)-.5)*14,
+             al:.82+mhash(k,13)*.18 };
+  }).sort((a,b)=>a.d-b.d);
+
+  meadowHit=[];
+  for(const f of fl){
+    const x=f.x*W, y=H*(.26+f.d*.68), sc=.42+f.d*.80;
+    const grow=.55+.45*cl(f.s.p,0,1);
+    const Hh=H*.135*f.hh*sc*grow, R=TIERR[sesTier(f.s)]*sc*.92*grow;
+    const dim=(.40+f.d*.60)*f.al;
+    const lean=f.lean+Math.sin(ph+f.ph)*.10*(.4+f.d);
+    c.strokeStyle='hsla(145,30%,'+(22+f.d*14)+'%,'+(dim*.85)+')';
+    c.lineWidth=Math.max(.55,.82*sc); c.lineCap='round';
+    c.beginPath(); c.moveTo(x,y);
+    c.quadraticCurveTo(x+lean*Hh*.45,y-Hh*.62,x+lean*Hh,y-Hh); c.stroke();
+    if(sesTier(f.s)>=2){
+      c.beginPath(); c.moveTo(x+lean*Hh*.35,y-Hh*.46);
+      c.quadraticCurveTo(x+lean*Hh*.35+4.5*sc,y-Hh*.60,x+lean*Hh*.35+6.5*sc,y-Hh*.44); c.stroke();
+    }
+    const fx=x+lean*Hh, fy=y-Hh;
+    drawHead(c,sesSpecies(f.s),fx,fy,R,dim,f.tint,1);
+    meadowHit.push({x:fx,y:fy,id:f.s.id});
+  }
+
+  for(let i=0;i<18;i++){
+    const pd=mhash(i,31), px=((mhash(i,32)*W)+now/(24000/(.4+pd))*W)%W;
+    const py=H*(.16+mhash(i,33)*.62)+Math.sin(now/2600+pd*9)*H*.035;
+    c.fillStyle='rgba(214,232,222,'+(.05+pd*.11)+')';
+    c.beginPath(); c.arc(px,py,.6+pd*.8,0,7); c.fill();
+  }
+
+  const wings=Math.min(5,Math.floor((S.streak||0)/7));
+  for(let i=0;i<wings;i++){
+    const sp=.00022+mhash(i,41)*.00016;
+    const bx=W*(.12+.76*((0.5+0.5*Math.sin(now*sp+i*2.1))));
+    const by=H*(.22+mhash(i,42)*.46)+Math.sin(now/900+i)*H*.05;
+    const fl2=Math.sin(now/90+i*3)*.9;
+    c.fillStyle='hsla('+(30+i*12)+',58%,72%,.62)';
+    c.save(); c.translate(bx,by);
+    c.beginPath(); c.ellipse(-2.1,0,2.0,Math.abs(fl2)*2.4+.5,-.4,0,7); c.fill();
+    c.beginPath(); c.ellipse( 2.1,0,2.0,Math.abs(fl2)*2.4+.5, .4,0,7); c.fill();
+    c.fillStyle='rgba(40,30,20,.75)';
+    c.beginPath(); c.ellipse(0,0,.7,1.9,0,0,7); c.fill();
+    c.restore();
+  }
+}
+function meadowClick(cv,ev){
+  const r=cv.getBoundingClientRect();
+  const mx=ev.clientX-r.left, my=ev.clientY-r.top;
+  let best=null,bd=1e9;
+  for(const h of meadowHit){ const d=(h.x-mx)*(h.x-mx)+(h.y-my)*(h.y-my); if(d<bd){bd=d;best=h;} }
+  if(best&&bd<900) sesInfo(best.id);
+}
+function meadowLoop(){
+  meadowRaf=requestAnimationFrame(meadowLoop);
+  if(document.hidden) return;
+  const a=$('#todayMeadow'), b=$('#fullMeadow');
+  if(a&&a.offsetParent) drawMeadow(a, S.sessions.filter(x=>dayOf(x.t)===today()), true);
+  if(b&&b.offsetParent) drawMeadow(b, S.sessions, false);
+}
+
+function drawPlant(cv, seed, p, live, bloom, mins){
+  mins=mins||25;
   const dpr=Math.min(window.devicePixelRatio||1,2);
   const W=cv.clientWidth||90, H=cv.clientHeight||120;
   if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){ cv.width=Math.round(W*dpr); cv.height=Math.round(H*dpr); }
@@ -569,7 +742,7 @@ function drawPlant(cv, seed, p, live, bloom){
   const hue=95+r()*85, lean=(r()-.5)*.5, nB=3+Math.floor(r()*4), pet=5+Math.floor(r()*4);
   const flHue=(hue+120+r()*120)%360;
   p=cl(p,0,1); const g=ease(p);
-  const bx=W*.5, by=H*.93, maxH=H*.80;
+  const bx=W*.5, by=H*.93, maxH=H*.66, RB=Math.min(W,H);
   const topY=by-maxH*g, cx=bx+lean*W*.30*g, mx=bx+lean*W*.10*g, my=by-maxH*g*.55;
   const pt=t=>[ (1-t)*(1-t)*bx+2*(1-t)*t*mx+t*t*cx, (1-t)*(1-t)*by+2*(1-t)*t*my+t*t*topY ];
 
@@ -613,22 +786,17 @@ function drawPlant(cv, seed, p, live, bloom){
   const [tx,ty]=pt(1);
   if(bloom||p>=.999){
     const bp=cl((p-.90)/.10,.25,1);
-    const gl=x.createRadialGradient(tx,ty,1,tx,ty,W*.30);
-    gl.addColorStop(0,'hsla('+flHue+',90%,66%,.34)'); gl.addColorStop(1,'hsla('+flHue+',90%,66%,0)');
-    x.fillStyle=gl; x.beginPath(); x.arc(tx,ty,W*.30,0,7); x.fill();
-    const R=W*.115*bp;
-    for(let i=0;i<pet;i++){
-      const a=i/pet*Math.PI*2+seed%7;
-      x.save(); x.translate(tx,ty); x.rotate(a);
-      x.fillStyle='hsla('+(flHue+i*5)+',85%,'+(60+i*2)+'%,.93)';
-      x.beginPath(); x.ellipse(0,-R*1.15,R*.62,R*1.15,0,0,7); x.fill();
-      x.restore();
-    }
-    x.fillStyle='hsl(45,95%,66%)'; x.beginPath(); x.arc(tx,ty,R*.62,0,7); x.fill();
+    const ti=tierOf(mins), sp2=TIERSP[ti][(seed>>>3)%TIERSP[ti].length];
+    const gl=x.createRadialGradient(tx,ty,1,tx,ty,RB*.34);
+    gl.addColorStop(0,'rgba(74,222,128,.22)'); gl.addColorStop(1,'rgba(74,222,128,0)');
+    x.fillStyle=gl; x.beginPath(); x.arc(tx,ty,RB*.34,0,7); x.fill();
+    drawHead(x, sp2, tx, ty, RB*.085*bp*(1+ti*.10), 1, 0, 1);
   }else{
-    const R=W*.035+W*.045*g;
-    x.fillStyle='hsl('+(hue+18)+',62%,'+(44+g*16)+'%)';
-    x.beginPath(); x.ellipse(tx,ty-R*.5,R*.72,R,0,0,7); x.fill();
+    const R=RB*.026+RB*.034*g;
+    x.fillStyle='hsl('+(hue+20)+',56%,'+(42+g*14)+'%)';
+    x.beginPath(); x.ellipse(tx,ty-R*.4,R*.66,R,0,0,7); x.fill();
+    x.fillStyle='hsla('+(hue+34)+',48%,66%,.45)';
+    x.beginPath(); x.ellipse(tx-R*.2,ty-R*.5,R*.2,R*.5,0,0,7); x.fill();
   }
   // elävät hiukkaset
   if(live){
@@ -649,13 +817,14 @@ function drawPlant(cv, seed, p, live, bloom){
    ============================================================ */
 let T=null, raf=null, hyperMark=0;
 const HINTS=[
- 'Jos ajatus karkaa, se on normaalia. Palaa takaisin ilman moitteita.',
- 'Ei tarvitse tehdä hyvin. Riittää että teet.',
- 'Sinun ei tarvitse tuntea motivaatiota. Tunne tulee liikkeen jälkeen.',
+ 'Jos ajatus karkaa, se on täysin normaalia. Palaa takaisin ilman moitteita.',
+ 'Ei tarvitse tehdä hyvin. Riittää, että teet.',
+ 'Motivaatiota ei tarvitse odottaa. Se tulee vasta liikkeen perässä.',
  'Kaikki muu odottaa. Tämä hetki riittää.',
- 'Jos mieleen putkahtaa muuta, laita se parkkiin. Se ei katoa.',
- 'Kasvi kasvaa niin pitkälle kuin ehdit. Keskeytys ei tapa sitä.',
- 'Puolikas jakso on ääretön määrä enemmän kuin nolla jaksoa.'
+ 'Jos mieleen putkahtaa jotain muuta, laita se parkkiin. Se ei katoa sinne.',
+ 'Kukka kasvaa juuri niin pitkälle kuin ehdit. Keskeytys ei tapa sitä.',
+ 'Puolikas jakso on äärettömästi enemmän kuin tekemättä jäänyt.',
+ 'Sinun ei tarvitse jaksaa loppuun asti. Riittää, että olet tässä nyt.'
 ];
 
 function startSession(pre){
@@ -667,7 +836,7 @@ function startSession(pre){
 }
 function ritual(cb){
   let n=3;
-  openModal('<div style="text-align:center;padding:14px 0"><p class="tiny mb12">Hengitä sisään. Katse ruutuun. Muu odottaa.</p><div id="cd" style="font-size:74px;font-weight:200;line-height:1;color:var(--acc)">3</div><p class="sub mt12">Alkaa…</p></div>');
+  openModal('<div style="text-align:center;padding:14px 0"><p class="tiny mb12">Hengitä sisään. Katse ruutuun. Kaikki muu odottaa.</p><div id="cd" style="font-size:74px;font-weight:200;line-height:1;color:var(--acc)">3</div><p class="sub mt12">Alkaa…</p></div>');
   ding([392],.25,.1);
   const iv=setInterval(()=>{
     n--;
@@ -704,20 +873,20 @@ function tick(){
   $('#mParked').textContent='Parkissa '+T.parked;
   $('#mInt').textContent='Keskeytyksiä '+T.interrupts;
   $('#mGrow').textContent='Kasvu '+Math.round(p*100)+' %';
-  drawPlant($('#plant'), T.seed, p, true, false);
-  if(S.hyper && el>hyperMark){ hyperMark+=45*60000; ding([440,330],.5,.1); buzz([40,80,40]); toast('45 min täynnä. Juo vettä, liikuta hartioita.'); }
+  drawPlant($('#plant'), T.seed, p, true, false, T.planned||Math.max(5,Math.round(elapsed()/60000)));
+  if(S.hyper && el>hyperMark){ hyperMark+=45*60000; ding([440,330],.5,.1); buzz([40,80,40]); toast('45 minuuttia takana. Juo vettä ja liikuta hartioita.'); }
   if(!T.open && el>=T.ms) finishSession();
 }
 function parkThought(){
-  const v=prompt('Mikä ajatus vie huomiota? Se odottaa täällä.');
-  if(v&&v.trim()){ S.parked.push({id:uid(),t:Date.now(),txt:v.trim()}); S.dump.push({id:uid(),t:Date.now(),txt:v.trim()}); save(); T.parked++; ding([660],.2,.08); toast('Parkissa. Jatka.'); }
+  const v=prompt('Mikä ajatus vie huomiota? Laita se tähän odottamaan, niin se ei katoa.');
+  if(v&&v.trim()){ S.parked.push({id:uid(),t:Date.now(),txt:v.trim()}); S.dump.push({id:uid(),t:Date.now(),txt:v.trim()}); save(); T.parked++; ding([660],.2,.08); toast('Parkissa. Jatka rauhassa.'); }
 }
-function addInterrupt(){ T.interrupts++; ding([300],.15,.06); toast('Merkitty. Palaa takaisin.'); }
+function addInterrupt(){ T.interrupts++; ding([300],.15,.06); toast('Merkitty. Palaa takaisin siihen, mitä olit tekemässä.'); }
 
 function finishSession(){ endSession(true); }
 function stopSession(){
   const p=progress(), mins=Math.round(elapsed()/60000);
-  if(mins<2){ if(!confirm('Alle 2 minuuttia — jaksoa ei tallenneta. Lopetetaanko?')) return; endSession(false,true); return; }
+  if(mins<2){ if(!confirm('Alle kaksi minuuttia — tästä ei jää kukkaa niitylle. Lopetetaanko silti?')) return; endSession(false,true); return; }
   endSession(false);
 }
 function endSession(done, discard){
@@ -746,8 +915,8 @@ function bumpStreak(){
 function showResult(s){
   const todayMin=S.sessions.filter(x=>dayOf(x.t)===today()).reduce((a,b)=>a+b.min,0);
   const msg = s.done
-    ? ['Vietiin loppuun. Juuri tuo on se taito jota harjoitellaan.','Koko jakso. Kasvi kukkii.','Valmis. Aivot saivat todisteen että pystyt.'][Math.floor(Math.random()*3)]
-    : ['Osittainenkin jakso kasvatti kasvin. Ei nollattu.','Keskeytit, mutta '+s.min+' minuuttia on tallessa.','Kasvi jäi nupulle. Se on silti kasvi.'][Math.floor(Math.random()*3)];
+    ? ['Vietiin loppuun asti. Juuri sitä taitoa tässä harjoitellaan.','Koko jakso takana, ja niitylle puhkesi kukka.','Valmis. Aivot saivat todisteen siitä, että pystyt.'][Math.floor(Math.random()*3)]
+    : ['Keskenkin jäänyt jakso kasvatti kukan. Mitään ei nollattu.','Keskeytit, mutta '+s.min+' minuuttia jäi talteen.','Kukka jäi nupulle. Se on silti kukka.'][Math.floor(Math.random()*3)];
   openModal(
     '<div style="text-align:center">'+
     '<div style="width:130px;height:170px;margin:0 auto 8px"><canvas id="resCv" style="width:100%;height:100%"></canvas></div>'+
@@ -758,20 +927,20 @@ function showResult(s){
       '<div class="stat"><b>'+todayMin+'</b><span>tänään yht.</span></div>'+
       '<div class="stat"><b>'+s.interrupts+'</b><span>keskeytystä</span></div>'+
     '</div>'+
-    (s.parked?'<p class="tiny mb16">Parkissa '+s.parked+' ajatusta — löydät ne aivotyhjennyksestä.</p>':'')+
-    '<div class="note mb16" style="text-align:left"><b>Tauko ennen seuraavaa.</b> Nouse ylös, juo vettä, katso ikkunasta ulos. Älä avaa somea — se syö juuri sen fokuksen jonka äsken rakensit.</div>'+
+    (s.parked?'<p class="tiny mb16">Parkissa '+s.parked+' ajatusta. Löydät ne aivotyhjennyksestä.</p>':'')+
+    '<div class="note mb16" style="text-align:left"><b>Pidä tauko ennen seuraavaa.</b> Nouse ylös, juo vettä ja katso hetki ikkunasta ulos. Somea ei kannata avata: se syö juuri sen keskittymisen, jonka äsken rakensit.</div>'+
     '<div class="wrap"><button class="btn pri grow" onclick="closeModal();breakTimer(5)">Tauko 5 min</button>'+
     '<button class="btn grow" onclick="closeModal();go(\'nyt\')">Jatkan suoraan</button></div>'+
     '</div>');
-  setTimeout(()=>{ const cv=$('#resCv'); if(cv) drawPlant(cv,s.seed,s.p,false,s.done); },40);
+  setTimeout(()=>{ const cv=$('#resCv'); if(cv) drawPlant(cv,s.seed,s.p,false,s.done,s.planned||s.min); },40);
 }
 function breakTimer(min){
   const end=Date.now()+min*60000;
-  openModal('<div style="text-align:center"><p class="tiny">TAUKO</p><div id="bclock" style="font-size:56px;font-weight:200;color:var(--acc2)">'+pad(min)+':00</div><div class="breathe">hengitä</div><p class="tiny mb16">Sisään neljä, ulos kuusi. Anna aivojen tyhjentyä hetki.</p><button class="btn wide" onclick="closeModal()">Ohita tauko</button></div>');
+  openModal('<div style="text-align:center"><p class="tiny">TAUKO</p><div id="bclock" style="font-size:56px;font-weight:200;color:var(--acc2)">'+pad(min)+':00</div><div class="breathe">hengitä</div><p class="tiny mb16">Sisään neljään laskien, ulos kuuteen. Anna aivojen tyhjentyä hetki.</p><button class="btn wide" onclick="closeModal()">Ohita tauko</button></div>');
   const iv=setInterval(()=>{
     const l=end-Date.now(); const el=$('#bclock');
     if(!el||!$('#modal').classList.contains('on')){ clearInterval(iv); return; }
-    if(l<=0){ clearInterval(iv); closeModal(); ding([784,988],.5,.13); toast('Tauko ohi. Valmis seuraavaan?'); return; }
+    if(l<=0){ clearInterval(iv); closeModal(); ding([784,988],.5,.13); toast('Tauko on ohi. Valmiina seuraavaan?'); return; }
     el.textContent=pad(Math.floor(l/60000))+':'+pad(Math.floor(l%60000/1000));
   },500);
 }
@@ -779,9 +948,9 @@ function breakTimer(min){
    NÄKYMÄT
    ============================================================ */
 const VIRE_TIP={
- 1:'Tyhjällä vireellä paras siirto on lyhyt jakso ja helpoin mahdollinen tehtävä. Tavoite ei ole laatu vaan liike.',
- 2:'Perusvire kestää 25 minuutin jakson hyvin. Valitse yksi asia, älä kolmea.',
- 3:'Terävä vire on harvinaista. Käytä se siihen vaikeaan juttuun, älä sähköposteihin.'
+ 1:'Tyhjällä vireellä paras siirto on lyhyt jakso ja helpoin mahdollinen tehtävä. Tavoitteena ei ole laatu, vaan liike.',
+ 2:'Tavallisella vireellä 25 minuutin jakso sujuu hyvin. Valitse yksi asia, älä kolmea.',
+ 3:'Terävä vire on harvinainen. Käytä se siihen vaikeaan juttuun, älä sähköposteihin.'
 };
 function renderNyt(){
   const h=new Date().getHours();
@@ -790,15 +959,15 @@ function renderNyt(){
   const tm=S.sessions.filter(x=>dayOf(x.t)===today());
   const mins=tm.reduce((a,b)=>a+b.min,0);
   $('#pStreak').textContent=S.streak; $('#pToday').textContent=mins;
-  $('#heroSub').textContent = mins===0 ? 'Ei vielä jaksoja tänään. Ensimmäinen on aina se vaikein.'
-    : tm.length===1 ? 'Yksi jakso takana. Kone on käynnissä.'
-    : tm.length+' jaksoa, '+mins+' minuuttia. Hyvä päivä.';
+  $('#heroSub').textContent = mins===0 ? 'Tänään ei vielä yhtään jaksoa. Ensimmäinen on aina se vaikein.'
+    : tm.length===1 ? 'Yksi jakso takana. Kone kävi käyntiin.'
+    : tm.length+' jaksoa ja '+mins+' minuuttia. Tämä on ollut hyvä päivä.';
 
   $$('#vireBox button').forEach(b=>b.classList.toggle('on', +b.dataset.v===S.vire));
   const vt=$('#vireTip');
   if(S.vire){ vt.style.display='block'; vt.textContent=VIRE_TIP[S.vire]; } else vt.style.display='none';
   $$('#durBox .chip').forEach(b=>b.classList.toggle('on', +b.dataset.d===S.dur));
-  $('#startSub').textContent = S.dur===0?'avoin jakso · kasvi kasvaa 45 min ajan':(S.dur+' minuuttia · kasvi kasvaa');
+  $('#startSub').textContent = S.dur===0?'avoin jakso · kukka kasvaa 45 minuutin ajan':(S.dur+' minuuttia · niitylle kasvaa kukka');
   if(!$('#curTask').value && S.curTask) $('#curTask').value=S.curTask;
 
   // ehdotukset vireen mukaan
@@ -806,17 +975,17 @@ function renderNyt(){
   let sug=open.filter(t=>!S.vire||!t.vire||t.vire<=S.vire).slice(0,5);
   if(!sug.length) sug=open.slice(0,4);
   $('#taskSuggest').innerHTML = sug.length? sug.map(t=>'<button class="chip" onclick="pick(\''+t.id+'\')">'+(t.frog?'🐸 ':'')+esc(t.name.slice(0,34))+'</button>').join('')
-    : '<span class="tiny">Ei tehtäviä listalla. Voit myös kirjoittaa suoraan yllä.</span>';
+    : '<span class="tiny">Listalla ei ole tehtäviä. Voit myös kirjoittaa aiheen suoraan yllä olevaan kenttään.</span>';
 
   renderDump();
-  const tg=S.sessions.filter(x=>dayOf(x.t)===today()).slice(-12);
-  $('#todayGarden').innerHTML = tg.length? tg.map(s=>cell(s)).join('') : '<p class="tiny" style="grid-column:1/-1">Tyhjä maa. Ensimmäinen jakso istuttaa ensimmäisen kasvin.</p>';
-  tg.forEach(s=>paint(s));
-  $('#todayTip').textContent = tg.length? 'Napauta kasvia nähdäksesi mistä se syntyi.' : '';
+  const tg=S.sessions.filter(x=>dayOf(x.t)===today());
+  drawMeadow($('#todayMeadow'), tg, true);
+  if(!meadowRaf) meadowLoop();
+  $('#todayTip').textContent = tg.length
+    ? 'Napauta kukkaa, niin näet, mistä jaksosta se kasvoi.'
+    : 'Niitty on vielä paljas. Ensimmäinen jakso kylvää ensimmäisen kukan.';
 }
 function pick(id){ const t=S.tasks.find(x=>x.id===id); if(!t)return; $('#curTask').value=t.name; if(t.min){ S.dur=t.min; save(); } renderNyt(); toast('Valittu: '+t.name.slice(0,28)); }
-function cell(s){ return '<div class="gcell" onclick="sesInfo(\''+s.id+'\')"><canvas id="c_'+s.id+'"></canvas><span>'+s.min+'m</span></div>'; }
-function paint(s){ const cv=$('#c_'+s.id); if(cv) drawPlant(cv,s.seed,s.p,false,s.done); }
 function sesInfo(id){
   const s=S.sessions.find(x=>x.id===id); if(!s) return;
   const d=new Date(s.t);
@@ -824,14 +993,14 @@ function sesInfo(id){
    '<h2>'+esc(s.task)+'</h2><p class="sub mb16">'+d.toLocaleDateString('fi-FI')+' klo '+pad(d.getHours())+':'+pad(d.getMinutes())+'</p>'+
    '<div class="statgrid mb16"><div class="stat"><b>'+s.min+'</b><span>min</span></div><div class="stat"><b>'+Math.round(s.p*100)+'%</b><span>kasvu</span></div><div class="stat"><b>'+(s.interrupts||0)+'</b><span>keskeytystä</span></div></div>'+
    '<button class="btn pri wide" onclick="closeModal();$(\'#curTask\').value='+JSON.stringify(s.task).replace(/"/g,'&quot;')+';go(\'nyt\')">Tee tämä uudelleen</button></div>');
-  setTimeout(()=>{ const cv=$('#iCv'); if(cv) drawPlant(cv,s.seed,s.p,false,s.done); },40);
+  setTimeout(()=>{ const cv=$('#iCv'); if(cv) drawPlant(cv,s.seed,s.p,false,s.done,s.planned||s.min); },40);
 }
 
 /* --------- AIVOTYHJENNYS --------- */
 function addDump(){
   const i=$('#dumpIn'), v=i.value.trim(); if(!v) return;
   S.dump.push({id:uid(),t:Date.now(),txt:v}); save(); i.value=''; ding([700],.15,.07);
-  renderDump(); toast('Ulkona päästä.');
+  renderDump(); toast('Nyt se on ulkona päästä.');
 }
 function renderDump(){
   const items=S.dump.slice().reverse();
@@ -839,7 +1008,7 @@ function renderDump(){
     '<div class="parked"><span class="grow">'+esc(d.txt)+'</span>'+
     '<button class="tdel" onclick="dumpToTask(\''+d.id+'\')" title="Tehtäväksi">＋</button>'+
     '<button class="tdel" onclick="delDump(\''+d.id+'\')" title="Poista">✕</button></div>').join('')
-    : '<p class="tiny">Tyhjä. Hyvä merkki.</p>';
+    : '<p class="tiny">Tyhjä kori. Hyvä merkki.</p>';
   const a=$('#dumpList'), b=$('#dumpList2'); if(a)a.innerHTML=html; if(b)b.innerHTML=html;
 }
 function delDump(id){ S.dump=S.dump.filter(d=>d.id!==id); S.parked=S.parked.filter(d=>d.id!==id); save(); renderDump(); }
@@ -863,17 +1032,17 @@ function taskRow(t){
 function renderTasks(){
   const open=S.tasks.filter(t=>!t.done), done=S.tasks.filter(t=>t.done);
   const frogs=open.filter(t=>t.frog);
-  $('#frogBox').innerHTML = frogs.length? '<div class="card" style="border-color:rgba(167,139,250,.35)"><h3 style="color:var(--vio)">🐸 Sammakko</h3><p class="tiny mb12">Se jota vältät. Välttely maksaa enemmän energiaa kuin tekeminen. Ota siitä 10 minuuttia — ei tarvitse tehdä loppuun.</p>'+frogs.map(taskRow).join('')+'</div>' : '';
-  $('#taskList').innerHTML = open.filter(t=>!t.frog).length? open.filter(t=>!t.frog).map(taskRow).join('') : '<p class="empty">Ei avoimia tehtäviä.<br>Lisää yksi tai heitä ajatus aivotyhjennykseen.</p>';
+  $('#frogBox').innerHTML = frogs.length? '<div class="card" style="border-color:rgba(167,139,250,.35)"><h3 style="color:var(--vio)">🐸 Sammakko</h3><p class="tiny mb12">Se, jota vältät. Välttely syö enemmän energiaa kuin itse tekeminen. Ota siitä kymmenen minuuttia, ei tarvitse tehdä loppuun.</p>'+frogs.map(taskRow).join('')+'</div>' : '';
+  $('#taskList').innerHTML = open.filter(t=>!t.frog).length? open.filter(t=>!t.frog).map(taskRow).join('') : '<p class="empty">Ei avoimia tehtäviä.<br>Lisää yksi, tai heitä ajatus aivotyhjennykseen.</p>';
   $('#doneList').innerHTML = done.slice().reverse().map(taskRow).join('') || '<p class="tiny">Ei vielä valmiita.</p>';
   $('#doneCount').textContent=done.length;
   renderDump();
 }
-function toggleTask(id){ const t=S.tasks.find(x=>x.id===id); if(!t)return; t.done=!t.done; save(); if(t.done){ding([784,1047],.35,.11);buzz(25);toast('Valmis. Merkitse se aivoihin.');} renderTasks(); renderNyt(); }
+function toggleTask(id){ const t=S.tasks.find(x=>x.id===id); if(!t)return; t.done=!t.done; save(); if(t.done){ding([784,1047],.35,.11);buzz(25);toast('Valmis. Anna sen tuntua hetki.');} renderTasks(); renderNyt(); }
 function delTask(id){ S.tasks=S.tasks.filter(x=>x.id!==id); save(); renderTasks(); renderNyt(); }
-function clearDone(){ if(!confirm('Poistetaanko valmiit tehtävät?'))return; S.tasks=S.tasks.filter(t=>!t.done); save(); renderTasks(); }
+function clearDone(){ if(!confirm('Poistetaanko kaikki valmiit tehtävät?'))return; S.tasks=S.tasks.filter(t=>!t.done); save(); renderTasks(); }
 
-/* --------- PUUTARHA --------- */
+/* --------- NIITTY --------- */
 function renderGarden(){
   const ss=S.sessions;
   $('#sTot').textContent=ss.length;
@@ -899,26 +1068,27 @@ function renderGarden(){
     hh+='<i style="background:'+(a?'rgba(74,222,128,'+a+')':'#14141f')+'" title="'+k+': '+v+' min"></i>'; }
   $('#heat').innerHTML=hh;
 
-  const list=ss.slice().reverse().slice(0,150);
-  $('#fullGarden').innerHTML=list.map(s=>cell(s)).join('');
-  list.forEach(s=>paint(s));
-  $('#gardenEmpty').textContent = ss.length? (ss.length>150?'Näytetään 150 uusinta.':'') : 'Puutarha on tyhjä. Ensimmäinen jakso istuttaa ensimmäisen kasvin.';
+  drawMeadow($('#fullMeadow'), ss, false);
+  if(!meadowRaf) meadowLoop();
+  $('#gardenEmpty').textContent = ss.length
+    ? 'Napauta kukkaa, niin näet, mistä jaksosta se kasvoi.'+(ss.length>420?' Niityllä näkyy 420 tuoreinta.':'')
+    : 'Niitty on vielä paljas. Ensimmäinen jakso kylvää ensimmäisen kukan.';
 
   // oivallukset
   const ins=[];
   if(ss.length>=3){
     const hrs={}; ss.forEach(s=>{ const h=new Date(s.t).getHours(); hrs[h]=(hrs[h]||0)+s.min; });
     const bh=Object.entries(hrs).sort((a,b)=>b[1]-a[1])[0];
-    ins.push('Paras keskittymisaikasi on noin klo <b>'+bh[0]+'</b>. Suojele sitä tuntia kalenterissa.');
+    ins.push('Keskityt parhaiten noin kello <b>'+bh[0]+'</b>. Suojele sitä tuntia kalenterissa, se on sinun paras tuntisi.');
     const dr=ss.filter(s=>s.done).length/ss.length;
-    ins.push('Viet loppuun <b>'+Math.round(dr*100)+' %</b> aloittamistasi jaksoista.'+(dr<.5?' Kokeile lyhyempää jaksoa — valmiiksi saatu 10 min opettaa aivoille enemmän kuin katkennut 45 min.':' Jaksojen pituus on sinulle sopiva.'));
+    ins.push('Viet loppuun <b>'+Math.round(dr*100)+' %</b> aloittamistasi jaksoista.'+(dr<.5?' Kokeile lyhyempää jaksoa: valmiiksi saatu kymmenen minuuttia opettaa aivoille enemmän kuin katkennut 45.':' Jaksojen pituus osuu sinulla kohdalleen.'));
     const avg=ss.reduce((a,b)=>a+b.min,0)/ss.length;
     ins.push('Keskimääräinen jakso <b>'+Math.round(avg)+' min</b>, keskeytyksiä <b>'+(ss.reduce((a,b)=>a+(b.interrupts||0),0)/ss.length).toFixed(1).replace('.',',')+'</b> per jakso.');
     const vs={1:[0,0],2:[0,0],3:[0,0]};
     ss.forEach(s=>{ if(vs[s.vire]){ vs[s.vire][0]+=s.min; vs[s.vire][1]++; } });
     const bv=Object.entries(vs).filter(e=>e[1][1]>0).sort((a,b)=>b[1][0]/b[1][1]-a[1][0]/a[1][1])[0];
-    if(bv) ins.push('Pisimmät jaksot syntyvät vireellä <b>'+({1:'🪫 tyhjä',2:'🔋 keskiverto',3:'⚡ terävä'})[bv[0]]+'</b>.');
-  } else ins.push('Kerää muutama jakso, niin täällä alkaa näkyä sinun omat kaavasi.');
+    if(bv) ins.push('Pisimmät jaksosi syntyvät vireellä <b>'+({1:'🪫 tyhjä',2:'🔋 tavallinen',3:'⚡ terävä'})[bv[0]]+'</b>.');
+  } else ins.push('Kerää muutama jakso, niin täällä alkavat näkyä sinun omat kaavasi.');
   $('#insights').innerHTML=ins.map(i=>'<p class="tiny mb8" style="line-height:1.65">• '+i+'</p>').join('');
 }
 
@@ -926,18 +1096,18 @@ function renderGarden(){
    APURI
    ============================================================ */
 const SITS=[
- {k:'stuck', t:'Olen jumissa', d:'Tiedän mitä pitäisi tehdä, mutta en liiku',
-  p:'Käyttäjä on jumissa eikä pääse liikkeelle. Älä motivoi yleisluontoisesti. Tunnista mikä konkreettinen kitka estää aloittamisen (epäselvyys, liian iso ensiaskel, puuttuva tieto, tunne, ympäristö) ja poista se.'},
+ {k:'stuck', t:'Olen jumissa', d:'Tiedän, mitä pitäisi tehdä, mutta en saa liikettä aikaan',
+  p:'Käyttäjä on jumissa eikä pääse liikkeelle. Älä motivoi yleisluontoisesti. Tunnista, mikä konkreettinen kitka estää aloittamisen (epäselvyys, liian iso ensiaskel, puuttuva tieto, tunne, ympäristö) ja poista se.'},
  {k:'big', t:'Liian iso', d:'Tehtävä tuntuu valtavalta',
   p:'Tehtävä on liian iso hahmotettavaksi. Pilko se konkreettisiksi osiksi joista jokainen kestää alle 25 minuuttia. Nimeä osat verbillä alkaen. Kerro missä järjestyksessä ne kannattaa tehdä ja miksi.'},
  {k:'prio', t:'Mitä ensin?', d:'Liikaa vaihtoehtoja, valinta jumittaa',
-  p:'Käyttäjällä on liikaa vaihtoehtoja ja valinta halvaannuttaa. Valitse hänen puolestaan yksi asia joka tehdään nyt, ja perustele lyhyesti. Kerro selkeästi mitä EI tehdä tänään. Älä anna listaa jossa on yli kolme asiaa.'},
- {k:'overload', t:'Ylikuormitus', d:'Pää on täynnä, mikään ei jäsenny',
+  p:'Käyttäjällä on liikaa vaihtoehtoja ja valinta halvaannuttaa. Valitse hänen puolestaan yksi asia, joka tehdään nyt, ja perustele lyhyesti. Kerro selkeästi, mitä tänään EI tehdä. Älä anna listaa, jossa on yli kolme asiaa.'},
+ {k:'overload', t:'Ylikuormitus', d:'Pää on aivan täynnä eikä mikään jäsenny',
   p:'Käyttäjän työmuisti on ylikuormittunut. Rauhoita ensin yhdellä lauseella. Jäsennä sitten hänen kertomansa asiat kolmeen koriin: TEHDÄÄN NYT, ODOTTAA, EI KUULU MINULLE. Lopuksi yksi pieni teko.'},
- {k:'boring', t:'Tylsä pakko', d:'Ei kiinnostava, mutta on tehtävä',
+ {k:'boring', t:'Tylsä pakko', d:'Ei kiinnosta lainkaan, mutta on tehtävä',
   p:'Tehtävä on tylsä eikä tuota luontaista kiinnostusta, mikä on ADHD-aivoille aito este. Ehdota konkreettisia keinoja lisätä kiinnostavuutta, kiireellisyyttä, uutuutta tai haastetta (esim. aikahaaste, ympäristön vaihto, tekemisen muodon muutos). Ei moralisointia.'},
  {k:'plan', t:'Suunnittele päivä', d:'Realistinen suunnitelma tälle päivälle',
-  p:'Rakenna käyttäjälle realistinen suunnitelma tälle päivälle hänen vireensä ja tehtäviensä pohjalta. Ole ankaran realistinen määrästä: ADHD-aivot yliarvioivat mitä päivään mahtuu. Sijoita vaikein asia parhaaseen vireeseen.'}
+  p:'Rakenna käyttäjälle realistinen suunnitelma tälle päivälle hänen vireensä ja tehtäviensä pohjalta. Ole ankaran realistinen määrästä: ADHD-aivot yliarvioivat sen, mitä päivään mahtuu. Sijoita vaikein asia parhaaseen vireeseen.'}
 ];
 let curSit='stuck';
 function renderSits(){
@@ -960,10 +1130,10 @@ function fillCtx(kind){
 }
 function buildPrompt(){
   const s=SITS.find(x=>x.k===curSit)||SITS[0];
-  const vire={0:'ei kerrottu',1:'tyhjä, energia matala',2:'keskiverto',3:'terävä ja korkea'}[S.vire];
+  const vire={0:'ei kerrottu',1:'tyhjä, energia matala',2:'tavallinen',3:'terävä ja korkea'}[S.vire];
   const tm=S.sessions.filter(x=>dayOf(x.t)===today());
   const p=
-`Olet käytännönläheinen valmentaja ihmiselle, jolla on ADHD. Vastaat suomeksi, lyhyesti ja lämpimästi, mutta ilman kliseitä ja ilman moralisointia. Et kysy vastakysymyksiä vaan annat vastauksen sillä tiedolla mitä sinulla on.
+`Olet käytännönläheinen valmentaja ihmiselle, jolla on ADHD. Vastaat suomeksi, lyhyesti ja lämpimästi, mutta ilman kliseitä ja ilman moralisointia. Et kysy vastakysymyksiä vaan annat vastauksen sillä tiedolla, joka sinulla on.
 
 TILANNE: ${s.p}
 
@@ -974,10 +1144,10 @@ TAUSTATIEDOT:
 - Vireystila juuri nyt: ${vire}
 - Tänään tehty ${tm.length} keskittymisjaksoa, yhteensä ${tm.reduce((a,b)=>a+b.min,0)} minuuttia
 - Putki: ${S.streak} päivää
-- Tehtävä jota yritetään: ${$('#curTask')?.value||S.curTask||'(ei valittu)'}
+- Tehtävä, jota yritetään: ${$('#curTask')?.value||S.curTask||'(ei valittu)'}
 
 VASTAA TÄSMÄLLEEN TÄSSÄ MUODOSSA:
-1) Yksi lause siitä mitä tässä oikeasti tapahtuu (ei syyllistämistä).
+1) Yksi lause siitä, mitä tässä oikeasti tapahtuu (ei syyllistämistä).
 2) 2–4 numeroitua konkreettista siirtoa, tärkein ensin. Jokainen alkaa verbillä ja on niin pieni ettei sitä voi epäonnistua.
 3) Viimeisenä rivinä täsmälleen näin, ilman muuta tekstiä:
 ASKEL: <yksi teko joka kestää 2–10 minuuttia ja jonka voi aloittaa heti>
@@ -993,12 +1163,12 @@ function fallbackCopy(t){ const a=document.createElement('textarea'); a.value=t;
 
 async function runApuri(){
   const txt=$('#apuIn').value.trim();
-  if(!txt && curSit!=='plan'){ $('#apuIn').focus(); toast('Kirjoita edes muutama sana'); return; }
+  if(!txt && curSit!=='plan'){ $('#apuIn').focus(); toast('Kirjoita edes muutama sana, niin apuri pääsee alkuun'); return; }
   const p=buildPrompt(); const card=$('#apuOutCard'); const out=$('#apuAnswer'); const btn=$('#apuBtn');
   card.style.display='block'; $('#apuActions').innerHTML='';
   if(!S.key){
     copyPrompt();
-    out.innerHTML='<div class="note"><b>Kehote on kopioitu leikepöydälle.</b><br>Avaa haluamasi tekoäly, liitä kehote ja tuo vastaus takaisin tänne — silloin voit käynnistää ajastimen suoraan ehdotetusta askeleesta.</div>'+
+    out.innerHTML='<div class="note"><b>Kehote on kopioitu leikepöydälle.</b><br>Avaa haluamasi tekoäly, liitä kehote sinne ja tuo vastaus takaisin tänne. Silloin voit käynnistää ajastimen suoraan ehdotetusta askeleesta.</div>'+
       '<div class="wrap mt12"><a class="btn sm" href="https://claude.ai/new" target="_blank" rel="noopener">Claude ↗</a><a class="btn sm" href="https://gemini.google.com" target="_blank" rel="noopener">Gemini ↗</a><a class="btn sm" href="https://chatgpt.com" target="_blank" rel="noopener">ChatGPT ↗</a></div>'+
       '<textarea class="mt12" id="pasteBack" placeholder="Liitä tekoälyn vastaus tähän…"></textarea>'+
       '<button class="btn wide mt8" onclick="parseBack()">Lue vastaus</button>'+
@@ -1017,11 +1187,11 @@ async function runApuri(){
     if(!a) throw new Error('Tyhjä vastaus');
     showAnswer(a);
   }catch(e){
-    out.innerHTML='<div class="note" style="border-color:rgba(248,113,113,.3)"><b>Ei onnistunut:</b> '+esc(e.message)+'<br>Tarkista API-avain ja mallin nimi asetuksista, tai käytä kopioitavaa kehotetta.</div>';
+    out.innerHTML='<div class="note" style="border-color:rgba(248,113,113,.3)"><b>Ei onnistunut:</b> '+esc(e.message)+'<br>Tarkista API-avain ja mallin nimi asetuksista tai käytä kopioitavaa kehotetta.</div>';
   }
   btn.textContent='Pyydä apua'; btn.disabled=false;
 }
-function parseBack(){ const v=$('#pasteBack')?.value.trim(); if(!v){toast('Liitä vastaus ensin');return;} showAnswer(v); }
+function parseBack(){ const v=$('#pasteBack')?.value.trim(); if(!v){toast('Liitä tekoälyn vastaus ensin');return;} showAnswer(v); }
 function showAnswer(a){
   const step=(a.match(/ASKEL:\s*(.+)/i)||[])[1]?.trim();
   const mins=parseInt((a.match(/MINUUTIT:\s*(\d+)/i)||[])[1]||'10',10);
@@ -1042,10 +1212,10 @@ function apuriToTask(step,mins){ S.tasks.push({id:uid(),name:step,vire:0,min:[5,
    HÄTÄJARRU
    ============================================================ */
 function openSOS(){
-  openModal('<h2>Ylikuormitus</h2><p class="sub mb16">Et ole laiska etkä rikki. Työmuisti on täynnä. Puretaan se 60 sekunnissa.</p>'+
+  openModal('<h2>Ylikuormitus</h2><p class="sub mb16">Et ole laiska etkä rikki. Työmuisti on vain täynnä. Puretaan se minuutissa.</p>'+
   '<div class="breathe">hengitä</div>'+
-  '<p class="tiny mb16" style="text-align:center">Sisään neljä laskien. Ulos kuusi laskien. Kolme kertaa.</p>'+
-  '<div class="note mb16"><b>1.</b> Kaikki keskeneräinen ulos päästä → kirjoita alle.<br><b>2.</b> Valitse listasta yksi asia. Vain yksi.<br><b>3.</b> Tee siitä 5 minuuttia. Ei enempää.</div>'+
+  '<p class="tiny mb16" style="text-align:center">Sisään neljään laskien, ulos kuuteen. Kolme kertaa peräkkäin.</p>'+
+  '<div class="note mb16"><b>1.</b> Kirjoita alle kaikki keskeneräinen, mitä päässä pyörii.<br><b>2.</b> Valitse listasta yksi asia. Vain yksi.<br><b>3.</b> Tee sitä viisi minuuttia. Ei yhtään enempää.</div>'+
   '<textarea id="sosDump" placeholder="Kaikki mikä painaa, ranskalaisin viivoin. Ei tarvitse olla järkevää."></textarea>'+
   '<button class="btn pri wide mt12" onclick="sosSave()">Tyhjennä pää</button>'+
   '<button class="btn wide ghost mt8" onclick="closeModal();openApuri(\'overload\')">Anna apurin jäsentää tämä</button>');
@@ -1053,7 +1223,7 @@ function openSOS(){
 function sosSave(){
   const v=$('#sosDump').value.trim();
   if(v){ v.split('\n').map(x=>x.replace(/^[-*•\s]+/,'').trim()).filter(Boolean).forEach(x=>S.dump.push({id:uid(),t:Date.now(),txt:x})); save(); renderDump(); }
-  closeModal(); S.dur=5; save(); renderNyt(); toast('Pää tyhjennetty. Ota nyt 5 minuuttia yhdestä asiasta.');
+  closeModal(); S.dur=5; save(); renderNyt(); toast('Pää on tyhjennetty. Ota nyt viisi minuuttia yhdestä asiasta.');
 }
 
 /* ============================================================
@@ -1073,11 +1243,11 @@ function importData(inp){
   const f=inp.files[0]; if(!f) return; const r=new FileReader();
   r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||typeof d!=='object') throw 0;
     S={...DEF,...d}; save(); toast('Data tuotu'); renderNyt(); renderTasks(); renderSettings();
-  }catch(e){ toast('Tiedostoa ei voitu lukea'); } };
+  }catch(e){ toast('Tiedostoa ei saatu luettua'); } };
   r.readAsText(f); inp.value='';
 }
-function resetAll(){ if(!confirm('Tämä poistaa kaikki tehtävät, kasvit ja tilastot pysyvästi. Jatketaanko?'))return;
-  if(!confirm('Varmasti? Ota ensin varmuuskopio jos et ole varma.'))return;
+function resetAll(){ if(!confirm('Tämä poistaa kaikki tehtävät, kukat ja tilastot lopullisesti. Jatketaanko?'))return;
+  if(!confirm('Oletko aivan varma? Ota varmuuskopio ennen kuin jatkat.'))return;
   localStorage.removeItem(KEY); S={...DEF}; renderNyt(); renderTasks(); renderSettings(); go('nyt'); toast('Nollattu'); }
 
 /* ============================================================
@@ -1091,7 +1261,7 @@ document.addEventListener('keydown',e=>{
   if(e.key===' '&&e.target===document.body&&!T){ e.preventDefault(); startSession(); }
 });
 window.addEventListener('beforeunload',e=>{ if(T){ e.preventDefault(); e.returnValue=''; } });
-window.addEventListener('resize',()=>{ if(T) drawPlant($('#plant'),T.seed,progress(),true,false); });
+window.addEventListener('resize',()=>{ if(T) drawPlant($('#plant'),T.seed,progress(),true,false,T.planned||25); });
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&T) tick(); });
 
 // streakin siivous: jos yli vuorokausi tauolla, putki nollautuu
@@ -1109,9 +1279,9 @@ renderSits(); buildPrompt(); renderNyt(); renderTasks(); renderSettings(); go('n
 if(!S.name && !S.sessions.length){
   setTimeout(()=>openModal(
    '<h2>Tervetuloa Fokuskoneeseen</h2>'+
-   '<p class="sub mb16">Työkalu on rakennettu sille oletukselle, että aloittaminen on vaikeampaa kuin tekeminen.</p>'+
-   '<div class="note mb16"><b>Näin se toimii:</b><br>1. Kerrot vireesi ja yhden asian johon keskityt.<br>2. Ajastin käy ja kasvi kasvaa reaaliajassa ruudulla.<br>3. Jos ajatus karkaa, laitat sen parkkiin — jakso ei katkea.<br>4. Kasvi jää puutarhaan todisteeksi.</div>'+
-   '<p class="tiny mb16"><b>Tärkeä ero moneen muuhun sovellukseen:</b> keskeytys ei tapa kasvia. Kasvi kasvaa juuri niin pitkälle kuin ehdit. Rangaistus ei auta ADHD-aivoja, todiste edistymisestä auttaa.</p>'+
+   '<p class="sub mb16">Tämä työkalu on rakennettu yhden oletuksen varaan: aloittaminen on vaikeampaa kuin itse tekeminen.</p>'+
+   '<div class="note mb16"><b>Näin se toimii:</b><br>1. Kerrot vireesi ja yhden asian, johon keskityt.<br>2. Ajastin käy, ja kasvi kasvaa ruudulla reaaliajassa.<br>3. Jos ajatus karkaa, laitat sen parkkiin. Jakso ei katkea siitä.<br>4. Lopuksi kukka jää niitylle todisteeksi.</div>'+
+   '<p class="tiny mb16"><b>Tärkeä ero moniin muihin sovelluksiin:</b> keskeytys ei tapa kasvia. Se kasvaa juuri niin pitkälle kuin ehdit, ja jää niitylle sellaisena. Rangaistus ei auta ADHD-aivoja, mutta todiste edistymisestä auttaa.</p>'+
    '<input id="wName" placeholder="Mikä on etunimesi?" class="mb12">'+
    '<button class="btn pri wide" onclick="S.name=($(\'#wName\').value||\'\').trim();save();closeModal();renderNyt();renderSettings()">Aloitetaan</button>'),600);
 }
